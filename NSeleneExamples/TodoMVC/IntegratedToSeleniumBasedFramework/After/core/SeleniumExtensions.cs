@@ -29,7 +29,7 @@ namespace NSeleneExamples.TodoMVC.IntegratedToSeleniumBasedFramework.After.Core
         {
             this.driver = driver;
             this.I = new SeleneDriver(this.driver);
-            PageFactory.InitElements(this.driver, this);
+            //PageFactory.InitElements(this.driver, this);
         }
 
         public void Open(string url)

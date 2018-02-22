@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Remoting.Messaging;
-using System.Runtime.Remoting.Proxies;
 using System.Threading;
 using NSelene;
 using NUnit.Framework;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Support.PageObjects;
@@ -22,11 +22,12 @@ namespace NSeleneTests.SeleniumInteroperability
     public class NSeleneBehaviorForPageFactoryIWebElementTests
     {
         IWebDriver driver;
+        private static readonly string ExecuteAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         [OneTimeSetUp]
         public void initDriver()
         {
-            driver = new FirefoxDriver();
+            driver = new ChromeDriver(ExecuteAssemblyPath);
         }
 
         [OneTimeTearDown]
@@ -86,13 +87,13 @@ namespace NSeleneTests.SeleniumInteroperability
 
         class PageWithDeferredWebElement
         {
-            [FindsBy(How = How.CssSelector, Using = "a")]
+            //[FindsBy(How = How.CssSelector, Using = "a")]
             public IWebElement Element;
 
             public PageWithDeferredWebElement(IWebDriver driver)
             {
                 this.driver = driver;
-                PageFactory.InitElements(this.driver, this);
+                Element = driver.FindElement(By.CssSelector("a"));
             }
 
             IWebDriver driver;
@@ -142,7 +143,7 @@ namespace NSeleneTests.SeleniumInteroperability
         [Test]
         public void ClassicPageWithSeleniumDriverFailsToLocateDeferredElementOfListByAppearance()
         {
-            var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(driver);
+            var page = new PageWithDeferredWebElementOfList(driver);
             Assert.Throws(Is.TypeOf(typeof(TargetInvocationException))
                           .And.InnerException.TypeOf(typeof(ArgumentOutOfRangeException)), () => {
                 page.Elements[1].Click();
@@ -153,7 +154,7 @@ namespace NSeleneTests.SeleniumInteroperability
         [Test]
         public void ClassicPageWithSeleniumDriverFailsToLocateDeferredElementOfListByVisibility()
         {
-            var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(driver);
+            var page = new PageWithDeferredWebElementOfList(driver);
             Thread.Sleep(300);
             Assert.Throws(Is.TypeOf(typeof(ElementNotVisibleException)), () => {
                 page.Elements[1].Click();
@@ -164,7 +165,7 @@ namespace NSeleneTests.SeleniumInteroperability
         [Test]
         public void ClassicPageWithDecoratedByNSeleneDriverFailsToLocateDeferredElementByAppearance()
         {
-            var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(new SeleneDriver(driver));
+            var page = new PageWithDeferredWebElementOfList(new SeleneDriver(driver));
             /* same as the following
             var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(new DefaultElementLocator(new SDriver(driver)));
              */
@@ -178,7 +179,7 @@ namespace NSeleneTests.SeleniumInteroperability
         [Test]
         public void ClassicPageWithDecoratedByNSeleneDriverLocatesDeferredElementByVisibility()
         {
-            var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(new SeleneDriver(driver));
+            var page = new PageWithDeferredWebElementOfList(new SeleneDriver(driver));
             /* same as the following
             var page = PageFactory.InitElements<PageWithDeferredWebElementOfList>(new DefaultElementLocator(new SDriver(driver)));
              */
@@ -187,14 +188,14 @@ namespace NSeleneTests.SeleniumInteroperability
             Assert.IsTrue(driver.Url.Contains("second"));
         }
 
-        [Test]
-        public void ClassicPageWithDecoratedByNSeleneDriverAndCustomLocatorLocatesDeferredElement()
-        {
-            var page = new PageWithDeferredWebElementOfListAndCustomFindsBy(new SeleneDriver(driver));
-            PageFactory.InitElements(page, new My.CustomElementLocator(new SeleneDriver(driver)), new My.CustomPageObjectMemberDecorator());
-            page.Elements[1].Click();
-            Assert.IsTrue(driver.Url.Contains("second"));
-        }
+        //[Test]
+        //public void ClassicPageWithDecoratedByNSeleneDriverAndCustomLocatorLocatesDeferredElement()
+        //{
+        //    var page = new PageWithDeferredWebElementOfListAndCustomFindsBy(new SeleneDriver(driver));
+        //    PageFactory.InitElements(page, new My.CustomElementLocator(new SeleneDriver(driver)), new My.CustomPageObjectMemberDecorator());
+        //    page.Elements[1].Click();
+        //    Assert.IsTrue(driver.Url.Contains("second"));
+        //}
 
         class PageWithDeferredWebElementOfList
         {
@@ -282,311 +283,311 @@ namespace NSeleneTests.SeleniumInteroperability
             }
         }
 
-        public class CustomPageObjectMemberDecorator : IPageObjectMemberDecorator
-        {
-            //
-            // Static Fields
-            //
-            private static List<Type> interfacesToBeProxied;
+        //public class CustomPageObjectMemberDecorator : IPageObjectMemberDecorator
+        //{
+        //    //
+        //    // Static Fields
+        //    //
+        //    private static List<Type> interfacesToBeProxied;
 
-            private static Type interfaceProxyType;
+        //    private static Type interfaceProxyType;
 
-            //
-            // Static Properties
-            //
-            private static Type InterfaceProxyType {
-                get {
-                    if (CustomPageObjectMemberDecorator.interfaceProxyType == null) {
-                        CustomPageObjectMemberDecorator.interfaceProxyType = CustomPageObjectMemberDecorator.CreateTypeForASingleElement ();
-                    }
-                    return CustomPageObjectMemberDecorator.interfaceProxyType;
-                }
-            }
+        //    //
+        //    // Static Properties
+        //    //
+        //    private static Type InterfaceProxyType {
+        //        get {
+        //            if (CustomPageObjectMemberDecorator.interfaceProxyType == null) {
+        //                CustomPageObjectMemberDecorator.interfaceProxyType = CustomPageObjectMemberDecorator.CreateTypeForASingleElement ();
+        //            }
+        //            return CustomPageObjectMemberDecorator.interfaceProxyType;
+        //        }
+        //    }
 
-            private static List<Type> InterfacesToBeProxied {
-                get {
-                    if (CustomPageObjectMemberDecorator.interfacesToBeProxied == null) {
-                        CustomPageObjectMemberDecorator.interfacesToBeProxied = new List<Type> ();
-                        CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(IWebElement));
-                        CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(ILocatable));
-                        CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(IWrapsElement));
-                    }
-                    return CustomPageObjectMemberDecorator.interfacesToBeProxied;
-                }
-            }
+        //    private static List<Type> InterfacesToBeProxied {
+        //        get {
+        //            if (CustomPageObjectMemberDecorator.interfacesToBeProxied == null) {
+        //                CustomPageObjectMemberDecorator.interfacesToBeProxied = new List<Type> ();
+        //                CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(IWebElement));
+        //                CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(ILocatable));
+        //                CustomPageObjectMemberDecorator.interfacesToBeProxied.Add (typeof(IWrapsElement));
+        //            }
+        //            return CustomPageObjectMemberDecorator.interfacesToBeProxied;
+        //        }
+        //    }
 
-            //
-            // Static Methods
-            //
-            protected static ReadOnlyCollection<By> CreateLocatorList (MemberInfo member)
-            {
-                if (member == null) {
-                    throw new ArgumentNullException ("member", "memeber cannot be null");
-                }
-                Attribute[] customAttributes = Attribute.GetCustomAttributes (member, typeof(FindsBySequenceAttribute), true);
-                bool flag = customAttributes.Length > 0;
-                Attribute[] customAttributes2 = Attribute.GetCustomAttributes (member, typeof(FindsByAllAttribute), true);
-                bool flag2 = customAttributes2.Length > 0;
-                if (flag && flag2) {
-                    throw new ArgumentException ("Cannot specify FindsBySequence and FindsByAll on the same member");
-                }
-                List<By> list = new List<By> ();
-                Attribute[] customAttributes3 = Attribute.GetCustomAttributes (member, typeof(FindsByAttribute), true);
-                if (customAttributes3.Length > 0) {
-                    Array.Sort<Attribute> (customAttributes3);
-                    Attribute[] array = customAttributes3;
-                    for (int i = 0; i < array.Length; i++) {
-                        Attribute attribute = array [i];
-                        FindsByAttribute findsByAttribute = (FindsByAttribute)attribute;
-                        if (findsByAttribute.Using == null) {
-                            findsByAttribute.Using = member.Name;
-                        }
-                        list.Add (findsByAttribute.Finder);
-                    }
-                    if (flag) {
-                        ByChained item = new ByChained (list.ToArray ());
-                        list.Clear ();
-                        list.Add (item);
-                    }
-                    if (flag2) {
-                        ByAll item2 = new ByAll (list.ToArray ());
-                        list.Clear ();
-                        list.Add (item2);
-                    }
-                }
-                return list.AsReadOnly ();
-            }
+        //    //
+        //    // Static Methods
+        //    //
+        //    protected static ReadOnlyCollection<By> CreateLocatorList (MemberInfo member)
+        //    {
+        //        if (member == null) {
+        //            throw new ArgumentNullException ("member", "memeber cannot be null");
+        //        }
+        //        Attribute[] customAttributes = Attribute.GetCustomAttributes (member, typeof(FindsBySequenceAttribute), true);
+        //        bool flag = customAttributes.Length > 0;
+        //        Attribute[] customAttributes2 = Attribute.GetCustomAttributes (member, typeof(FindsByAllAttribute), true);
+        //        bool flag2 = customAttributes2.Length > 0;
+        //        if (flag && flag2) {
+        //            throw new ArgumentException ("Cannot specify FindsBySequence and FindsByAll on the same member");
+        //        }
+        //        List<By> list = new List<By> ();
+        //        Attribute[] customAttributes3 = Attribute.GetCustomAttributes (member, typeof(FindsByAttribute), true);
+        //        if (customAttributes3.Length > 0) {
+        //            Array.Sort<Attribute> (customAttributes3);
+        //            Attribute[] array = customAttributes3;
+        //            for (int i = 0; i < array.Length; i++) {
+        //                Attribute attribute = array [i];
+        //                FindsByAttribute findsByAttribute = (FindsByAttribute)attribute;
+        //                if (findsByAttribute.Using == null) {
+        //                    findsByAttribute.Using = member.Name;
+        //                }
+        //                list.Add (findsByAttribute.Finder);
+        //            }
+        //            if (flag) {
+        //                ByChained item = new ByChained (list.ToArray ());
+        //                list.Clear ();
+        //                list.Add (item);
+        //            }
+        //            if (flag2) {
+        //                ByAll item2 = new ByAll (list.ToArray ());
+        //                list.Clear ();
+        //                list.Add (item2);
+        //            }
+        //        }
+        //        return list.AsReadOnly ();
+        //    }
 
-            private static object CreateProxyObject (Type memberType, IElementLocator locator, IEnumerable<By> bys, bool cache)
-            {
-                object result = null;
-                if (memberType == typeof(IList<IWebElement>)) {
-                    using (List<Type>.Enumerator enumerator = CustomPageObjectMemberDecorator.InterfacesToBeProxied.GetEnumerator ()) {
-                        while (enumerator.MoveNext ()) {
-                            Type current = enumerator.Current;
-                            Type type = typeof(IList<>).MakeGenericType (new Type[] {
-                                current
-                            });
-                            if (type.Equals (memberType)) {
-                                result = WebElementListProxy.CreateProxy (memberType, locator, bys, cache);
-                                break;
-                            }
-                        }
-                        return result;
-                    }
-                }
-                if (!(memberType == typeof(IWebElement))) {
-                    throw new ArgumentException ("Type of member '" + memberType.Name + "' is not IWebElement or IList<IWebElement>");
-                }
-                result = WebElementProxy.CreateProxy (CustomPageObjectMemberDecorator.InterfaceProxyType, locator, bys, cache);
-                return result;
-            }
+        //    //private static object CreateProxyObject (Type memberType, IElementLocator locator, IEnumerable<By> bys, bool cache)
+        //    //{
+        //    //    object result = null;
+        //    //    if (memberType == typeof(IList<IWebElement>)) {
+        //    //        using (List<Type>.Enumerator enumerator = CustomPageObjectMemberDecorator.InterfacesToBeProxied.GetEnumerator ()) {
+        //    //            while (enumerator.MoveNext ()) {
+        //    //                Type current = enumerator.Current;
+        //    //                Type type = typeof(IList<>).MakeGenericType (new Type[] {
+        //    //                    current
+        //    //                });
+        //    //                if (type.Equals (memberType)) {
+        //    //                    result = WebElementListProxy.CreateProxy (memberType, locator, bys, cache);
+        //    //                    break;
+        //    //                }
+        //    //            }
+        //    //            return result;
+        //    //        }
+        //    //    }
+        //    //    if (!(memberType == typeof(IWebElement))) {
+        //    //        throw new ArgumentException ("Type of member '" + memberType.Name + "' is not IWebElement or IList<IWebElement>");
+        //    //    }
+        //    //    result = WebElementProxy.CreateProxy (CustomPageObjectMemberDecorator.InterfaceProxyType, locator, bys, cache);
+        //    //    return result;
+        //    //}
 
-            private static Type CreateTypeForASingleElement ()
-            {
-                AssemblyName assemblyName = new AssemblyName (Guid.NewGuid ().ToString ());
-                AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
-                ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule (assemblyName.Name);
-                TypeBuilder typeBuilder = moduleBuilder.DefineType (typeof(IWebElement).FullName, TypeAttributes.Public | TypeAttributes.ClassSemanticsMask | TypeAttributes.Abstract);
-                foreach (Type current in CustomPageObjectMemberDecorator.InterfacesToBeProxied) {
-                    typeBuilder.AddInterfaceImplementation (current);
-                }
-                return typeBuilder.CreateType ();
-            }
+        //    private static Type CreateTypeForASingleElement ()
+        //    {
+        //        AssemblyName assemblyName = new AssemblyName (Guid.NewGuid ().ToString ());
+        //        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly (assemblyName, AssemblyBuilderAccess.Run);
+        //        ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule (assemblyName.Name);
+        //        TypeBuilder typeBuilder = moduleBuilder.DefineType (typeof(IWebElement).FullName, TypeAttributes.Public | TypeAttributes.ClassSemanticsMask | TypeAttributes.Abstract);
+        //        foreach (Type current in CustomPageObjectMemberDecorator.InterfacesToBeProxied) {
+        //            typeBuilder.AddInterfaceImplementation (current);
+        //        }
+        //        return typeBuilder.CreateType ();
+        //    }
 
-            protected static bool ShouldCacheLookup (MemberInfo member)
-            {
-                if (member == null) {
-                    throw new ArgumentNullException ("member", "memeber cannot be null");
-                }
-                Type typeFromHandle = typeof(CacheLookupAttribute);
-                return member.GetCustomAttributes (typeFromHandle, true).Length != 0 || member.DeclaringType.GetCustomAttributes (typeFromHandle, true).Length != 0;
-            }
+        //    protected static bool ShouldCacheLookup (MemberInfo member)
+        //    {
+        //        if (member == null) {
+        //            throw new ArgumentNullException ("member", "memeber cannot be null");
+        //        }
+        //        Type typeFromHandle = typeof(CacheLookupAttribute);
+        //        return member.GetCustomAttributes (typeFromHandle, true).Length != 0 || member.DeclaringType.GetCustomAttributes (typeFromHandle, true).Length != 0;
+        //    }
 
-            //
-            // Methods
-            //
-            public object Decorate (MemberInfo member, IElementLocator locator)
-            {
-                FieldInfo fieldInfo = member as FieldInfo;
-                PropertyInfo propertyInfo = member as PropertyInfo;
-                Type memberType = null;
-                if (fieldInfo != null) {
-                    memberType = fieldInfo.FieldType;
-                }
-                bool flag = false;
-                if (propertyInfo != null) {
-                    flag = propertyInfo.CanWrite;
-                    memberType = propertyInfo.PropertyType;
-                }
-                if (fieldInfo == null & (propertyInfo == null || !flag)) {
-                    return null;
-                }
-                IList<By> list = CustomPageObjectMemberDecorator.CreateLocatorList (member);
-                if (list.Count > 0) {
-                    bool cache = CustomPageObjectMemberDecorator.ShouldCacheLookup (member);
-                    return CustomPageObjectMemberDecorator.CreateProxyObject (memberType, locator, list, cache);
-                }
-                return null;
-            }
-        }
+        //    //
+        //    // Methods
+        //    //
+        //    //public object Decorate (MemberInfo member, IElementLocator locator)
+        //    //{
+        //    //    FieldInfo fieldInfo = member as FieldInfo;
+        //    //    PropertyInfo propertyInfo = member as PropertyInfo;
+        //    //    Type memberType = null;
+        //    //    if (fieldInfo != null) {
+        //    //        memberType = fieldInfo.FieldType;
+        //    //    }
+        //    //    bool flag = false;
+        //    //    if (propertyInfo != null) {
+        //    //        flag = propertyInfo.CanWrite;
+        //    //        memberType = propertyInfo.PropertyType;
+        //    //    }
+        //    //    if (fieldInfo == null & (propertyInfo == null || !flag)) {
+        //    //        return null;
+        //    //    }
+        //    //    IList<By> list = CustomPageObjectMemberDecorator.CreateLocatorList (member);
+        //    //    if (list.Count > 0) {
+        //    //        bool cache = CustomPageObjectMemberDecorator.ShouldCacheLookup (member);
+        //    //        return CustomPageObjectMemberDecorator.CreateProxyObject (memberType, locator, list, cache);
+        //    //    }
+        //    //    return null;
+        //    //}
+        //}
 
-        class WebElementListProxy : WebDriverObjectProxy
-        {
-            //
-            // Fields
-            //
-            private IList<IWebElement> collection;
+        //class WebElementListProxy : WebDriverObjectProxy
+        //{
+        //    //
+        //    // Fields
+        //    //
+        //    private IList<IWebElement> collection;
 
-            //
-            // Properties
-            //
-            private IList<IWebElement> ElementList {
-                get {
-                    if (!base.Cache || this.collection == null) {
-                        this.collection = base.Locator.LocateElements (base.Bys);
-                        /* CHANGED over > 
-                        this.collection = new List<IWebElement> ();
-                        this.collection.AddRange (base.Locator.LocateElements (base.Bys));
-                         */
-                    }
-                    return this.collection;
-                }
-            }
+        //    //
+        //    // Properties
+        //    //
+        //    private IList<IWebElement> ElementList {
+        //        get {
+        //            if (!base.Cache || this.collection == null) {
+        //                this.collection = base.Locator.LocateElements (base.Bys);
+        //                /* CHANGED over > 
+        //                this.collection = new List<IWebElement> ();
+        //                this.collection.AddRange (base.Locator.LocateElements (base.Bys));
+        //                 */
+        //            }
+        //            return this.collection;
+        //        }
+        //    }
 
-            //
-            // Constructors
-            //
-            private WebElementListProxy (Type typeToBeProxied, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (typeToBeProxied, locator, bys, cache)
-            {
-            }
+        //    //
+        //    // Constructors
+        //    //
+        //    private WebElementListProxy (Type typeToBeProxied, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (typeToBeProxied, locator, bys, cache)
+        //    {
+        //    }
 
-            //
-            // Static Methods
-            //
-            public static object CreateProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cacheLookups)
-            {
-                return new WebElementListProxy (classToProxy, locator, bys, cacheLookups).GetTransparentProxy ();
-            }
+        //    //
+        //    // Static Methods
+        //    //
+        //    //public static object CreateProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cacheLookups)
+        //    //{
+        //    //    return new WebElementListProxy (classToProxy, locator, bys, cacheLookups).GetTransparentProxy ();
+        //    //}
 
-            //
-            // Methods
-            //
-            public override IMessage Invoke (IMessage msg)
-            {
-                IList<IWebElement> elementList = this.ElementList;
-                return WebDriverObjectProxy.InvokeMethod (msg as IMethodCallMessage, elementList);
-            }
-        }
+        //    //
+        //    // Methods
+        //    //
+        //    //public override IMessage Invoke (IMessage msg)
+        //    //{
+        //    //    IList<IWebElement> elementList = this.ElementList;
+        //    //    return WebDriverObjectProxy.InvokeMethod (msg as IMethodCallMessage, elementList);
+        //    //}
+        //}
 
-        sealed class WebElementProxy : WebDriverObjectProxy, IWrapsElement
-        {
-            //
-            // Fields
-            //
-            private IWebElement cachedElement;
+        //sealed class WebElementProxy : WebDriverObjectProxy, IWrapsElement
+        //{
+        //    //
+        //    // Fields
+        //    //
+        //    private IWebElement cachedElement;
 
-            //
-            // Properties
-            //
-            private IWebElement Element {
-                get {
-                    if (!base.Cache || this.cachedElement == null) {
-                        this.cachedElement = base.Locator.LocateElement (base.Bys);
-                    }
-                    return this.cachedElement;
-                }
-            }
+        //    //
+        //    // Properties
+        //    //
+        //    private IWebElement Element {
+        //        get {
+        //            if (!base.Cache || this.cachedElement == null) {
+        //                this.cachedElement = base.Locator.LocateElement (base.Bys);
+        //            }
+        //            return this.cachedElement;
+        //        }
+        //    }
 
-            public IWebElement WrappedElement {
-                get {
-                    return this.Element;
-                }
-            }
+        //    public IWebElement WrappedElement {
+        //        get {
+        //            return this.Element;
+        //        }
+        //    }
 
-            //
-            // Constructors
-            //
-            private WebElementProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (classToProxy, locator, bys, cache)
-            {
-            }
+        //    //
+        //    // Constructors
+        //    //
+        //    private WebElementProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (classToProxy, locator, bys, cache)
+        //    {
+        //    }
 
-            //
-            // Static Methods
-            //
-            public static object CreateProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cacheLookups)
-            {
-                return new WebElementProxy (classToProxy, locator, bys, cacheLookups).GetTransparentProxy ();
-            }
+        //    //
+        //    // Static Methods
+        //    //
+        //    //public static object CreateProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cacheLookups)
+        //    //{
+        //    //    return new WebElementProxy (classToProxy, locator, bys, cacheLookups).GetTransparentProxy ();
+        //    //}
 
-            //
-            // Methods
-            //
-            public override IMessage Invoke (IMessage msg)
-            {
-                IWebElement element = this.Element;
-                IMethodCallMessage methodCallMessage = msg as IMethodCallMessage;
-                if (typeof(IWrapsElement).IsAssignableFrom ((methodCallMessage.MethodBase as MethodInfo).DeclaringType)) {
-                    return new ReturnMessage (element, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                return WebDriverObjectProxy.InvokeMethod (methodCallMessage, element);
-            }
-        }
+        //    //
+        //    // Methods
+        //    //
+        //    //public override IMessage Invoke (IMessage msg)
+        //    //{
+        //    //    IWebElement element = this.Element;
+        //    //    IMethodCallMessage methodCallMessage = msg as IMethodCallMessage;
+        //    //    if (typeof(IWrapsElement).IsAssignableFrom ((methodCallMessage.MethodBase as MethodInfo).DeclaringType)) {
+        //    //        return new ReturnMessage (element, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+        //    //    }
+        //    //    return WebDriverObjectProxy.InvokeMethod (methodCallMessage, element);
+        //    //}
+        //}
 
-        abstract class WebDriverObjectProxy : RealProxy
-        {
-            //
-            // Fields
-            //
-            private readonly IElementLocator locator;
+        //abstract class WebDriverObjectProxy : RealProxy
+        //{
+        //    //
+        //    // Fields
+        //    //
+        //    private readonly IElementLocator locator;
 
-            private readonly IEnumerable<By> bys;
+        //    private readonly IEnumerable<By> bys;
 
-            private readonly bool cache;
+        //    private readonly bool cache;
 
-            //
-            // Properties
-            //
-            protected IEnumerable<By> Bys {
-                get {
-                    return this.bys;
-                }
-            }
+        //    //
+        //    // Properties
+        //    //
+        //    protected IEnumerable<By> Bys {
+        //        get {
+        //            return this.bys;
+        //        }
+        //    }
 
-            protected bool Cache {
-                get {
-                    return this.cache;
-                }
-            }
+        //    protected bool Cache {
+        //        get {
+        //            return this.cache;
+        //        }
+        //    }
 
-            protected IElementLocator Locator {
-                get {
-                    return this.locator;
-                }
-            }
+        //    protected IElementLocator Locator {
+        //        get {
+        //            return this.locator;
+        //        }
+        //    }
 
-            //
-            // Constructors
-            //
-            protected WebDriverObjectProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (classToProxy)
-            {
-                this.locator = locator;
-                this.bys = bys;
-                this.cache = cache;
-            }
+        //    //
+        //    // Constructors
+        //    //
+        //    protected WebDriverObjectProxy (Type classToProxy, IElementLocator locator, IEnumerable<By> bys, bool cache) : base (classToProxy)
+        //    {
+        //        this.locator = locator;
+        //        this.bys = bys;
+        //        this.cache = cache;
+        //    }
 
-            //
-            // Static Methods
-            //
-            protected static ReturnMessage InvokeMethod (IMethodCallMessage msg, object representedValue)
-            {
-                if (msg == null) {
-                    throw new ArgumentNullException ("msg", "The message containing invocation information cannot be null");
-                }
-                MethodInfo methodInfo = msg.MethodBase as MethodInfo;
-                return new ReturnMessage (methodInfo.Invoke (representedValue, msg.Args), null, 0, msg.LogicalCallContext, msg);
-            }
-        }
+        //    //
+        //    // Static Methods
+        //    //
+        //    protected static ReturnMessage InvokeMethod (IMethodCallMessage msg, object representedValue)
+        //    {
+        //        if (msg == null) {
+        //            throw new ArgumentNullException ("msg", "The message containing invocation information cannot be null");
+        //        }
+        //        MethodInfo methodInfo = msg.MethodBase as MethodInfo;
+        //        return new ReturnMessage (methodInfo.Invoke (representedValue, msg.Args), null, 0, msg.LogicalCallContext, msg);
+        //    }
+        //}
 
         [AttributeUsage (AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
         public sealed class FindsByAttribute : Attribute, IComparable

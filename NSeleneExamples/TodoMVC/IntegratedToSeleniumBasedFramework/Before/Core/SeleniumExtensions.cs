@@ -21,7 +21,7 @@ namespace NSeleneExamples.TodoMVC.IntegratedToSeleniumBasedFramework.Before.Core
         public PageObject(IWebDriver driver)
         {
             this.driver = driver;
-            PageFactory.InitElements(this.driver, this);
+            //PageFactory.InitElements(this.driver, this);
         }
 
         public void Open(string url)

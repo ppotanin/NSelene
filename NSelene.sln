@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSelene", "NSelene\NSelene.csproj", "{C9C40CB0-17E2-4264-B216-1202A97BE857}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSelene", "NSelene\NSelene.csproj", "{599AA86D-5BE7-43A8-930D-B372BAC55F6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSeleneExamples", "NSeleneExamples\NSeleneExamples.csproj", "{8151DF05-741C-4DF2-A227-203B827F2B75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSeleneExamples", "NSeleneExamples\NSeleneExamples.csproj", "{ACB38C9A-3FB4-4E2A-801F-C4012E0F8F80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSeleneTests", "NSeleneTests\NSeleneTests.csproj", "{8AC6DF4D-D61E-4524-B708-25B168F164CC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6674F65C-7898-4C7F-9A12-583672956C41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSeleneTests", "NSeleneTests\NSeleneTests.csproj", "{78758099-56DF-44D6-B898-C9875BF8758F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,53 +15,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8151DF05-741C-4DF2-A227-203B827F2B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8151DF05-741C-4DF2-A227-203B827F2B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8151DF05-741C-4DF2-A227-203B827F2B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8151DF05-741C-4DF2-A227-203B827F2B75}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AC6DF4D-D61E-4524-B708-25B168F164CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AC6DF4D-D61E-4524-B708-25B168F164CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AC6DF4D-D61E-4524-B708-25B168F164CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AC6DF4D-D61E-4524-B708-25B168F164CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9C40CB0-17E2-4264-B216-1202A97BE857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9C40CB0-17E2-4264-B216-1202A97BE857}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9C40CB0-17E2-4264-B216-1202A97BE857}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9C40CB0-17E2-4264-B216-1202A97BE857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{599AA86D-5BE7-43A8-930D-B372BAC55F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{599AA86D-5BE7-43A8-930D-B372BAC55F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{599AA86D-5BE7-43A8-930D-B372BAC55F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{599AA86D-5BE7-43A8-930D-B372BAC55F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB38C9A-3FB4-4E2A-801F-C4012E0F8F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB38C9A-3FB4-4E2A-801F-C4012E0F8F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB38C9A-3FB4-4E2A-801F-C4012E0F8F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB38C9A-3FB4-4E2A-801F-C4012E0F8F80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78758099-56DF-44D6-B898-C9875BF8758F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78758099-56DF-44D6-B898-C9875BF8758F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78758099-56DF-44D6-B898-C9875BF8758F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78758099-56DF-44D6-B898-C9875BF8758F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		Policies = $0
-		$0.TextStylePolicy = $1
-		$1.inheritsSet = VisualStudio
-		$1.inheritsScope = text/plain
-		$1.scope = text/x-csharp
-		$0.CSharpFormattingPolicy = $2
-		$2.IndentSwitchBody = True
-		$2.IndentBlocksInsideExpressions = True
-		$2.AnonymousMethodBraceStyle = NextLine
-		$2.PropertyBraceStyle = NextLine
-		$2.PropertyGetBraceStyle = NextLine
-		$2.PropertySetBraceStyle = NextLine
-		$2.EventBraceStyle = NextLine
-		$2.EventAddBraceStyle = NextLine
-		$2.EventRemoveBraceStyle = NextLine
-		$2.StatementBraceStyle = NextLine
-		$2.ElseNewLinePlacement = NewLine
-		$2.CatchNewLinePlacement = NewLine
-		$2.FinallyNewLinePlacement = NewLine
-		$2.WhileNewLinePlacement = DoNotCare
-		$2.ArrayInitializerWrapping = DoNotChange
-		$2.ArrayInitializerBraceStyle = NextLine
-		$2.BeforeMethodDeclarationParentheses = False
-		$2.BeforeMethodCallParentheses = False
-		$2.BeforeConstructorDeclarationParentheses = False
-		$2.NewLineBeforeConstructorInitializerColon = NewLine
-		$2.NewLineAfterConstructorInitializerColon = SameLine
-		$2.BeforeDelegateDeclarationParentheses = False
-		$2.NewParentheses = False
-		$2.SpacesBeforeBrackets = False
-		$2.inheritsSet = Mono
-		$2.inheritsScope = text/x-csharp
-		$2.scope = text/x-csharp
-		version = 0.0.0.6
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {875C663D-3D27-41BF-8FC8-34E75C62E3F3}
 	EndGlobalSection
 EndGlobal

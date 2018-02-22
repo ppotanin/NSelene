@@ -34,7 +34,7 @@ namespace NSeleneExamples.TodoMVC.IntegratedToSeleniumBasedFramework.AfterPlusAl
         {
             this.driver = driver;
             this.Browser = new SeleneDriver(this.driver);
-            PageFactory.InitElements(this.driver, this);
+            //PageFactory.InitElements(this.driver, this);
         }
 
         public SeleneElement Element(string cssSelector)

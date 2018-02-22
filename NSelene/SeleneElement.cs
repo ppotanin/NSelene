@@ -47,7 +47,7 @@ namespace NSelene
     }
 
     // TODO: consider extracting SElement as interface... 
-    public sealed class SeleneElement : SElement,
+    public sealed class SeleneElement : SElement, 
         WrapsWebElement, IWebElement, ISearchContext, SeleneContext
     {
         readonly SeleneLocator<IWebElement> locator;
@@ -291,6 +291,12 @@ namespace NSelene
         {
             Should(Be.InDom);
             return this.ActualWebElement.GetAttribute(name);
+        }
+
+        public string GetProperty(string propertyName)
+        {
+            Should(Be.InDom);
+            return this.ActualWebElement.GetProperty(propertyName);
         }
 
         public string GetCssValue(string property)

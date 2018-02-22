@@ -37,18 +37,24 @@ namespace NSeleneExamples.TodoMVC.IntegratedToSeleniumBasedFramework.After.Pages
          * As you can see, all "old" code still works as it was working before...
          */
 
-        public Tasks(IWebDriver driver) : base(driver) {}
-        
-        [FindsBy(How = How.Id, Using = "new-todo")]
+        public Tasks(IWebDriver driver) : base(driver)
+        {
+            newTodo = I.Find(By.Id("new-todo"));
+            list = I.FindAll(By.CssSelector("#todo-list>li"));
+            activeFilter = I.Find(By.LinkText("Active"));
+            completedFilter = I.Find(By.LinkText("Completed"));
+        }
+
+        //[FindsBy(How = How.Id, Using = "new-todo")]
         IWebElement newTodo;
 
-        [FindsBy(How = How.CssSelector, Using = "#todo-list>li")]
+        //[FindsBy(How = How.CssSelector, Using = "#todo-list>li")]
         IList<IWebElement> list;
 
-        [FindsBy(How = How.LinkText, Using = "Active")]
+        //[FindsBy(How = How.LinkText, Using = "Active")]
         IWebElement activeFilter;
 
-        [FindsBy(How = How.LinkText, Using = "Completed")]
+        //[FindsBy(How = How.LinkText, Using = "Completed")]
         IWebElement completedFilter;
 
         public void Visit()

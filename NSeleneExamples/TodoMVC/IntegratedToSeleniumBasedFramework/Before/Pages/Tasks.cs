@@ -10,18 +10,24 @@ namespace NSeleneExamples.TodoMVC.IntegratedToSeleniumBasedFramework.Before.Page
 {
     public class Tasks : PageObject
     {
-        public Tasks(IWebDriver driver) : base(driver) {}
+        public Tasks(IWebDriver driver) : base(driver)
+        {
+            newTodo = driver.FindElement(By.Id("new-todo"));
+            list = driver.FindElements(By.CssSelector("#todo-list>li"));
+            activeFilter = driver.FindElement(By.LinkText("Active"));
+            completedFilter = driver.FindElement(By.LinkText("Completed"));
+        }
         
-        [FindsBy(How = How.Id, Using = "new-todo")]
+        //[FindsBy(How = How.Id, Using = "new-todo")]
         IWebElement newTodo;
 
-        [FindsBy(How = How.CssSelector, Using = "#todo-list>li")]
+       // [FindsBy(How = How.CssSelector, Using = "#todo-list>li")]
         IList<IWebElement> list;
 
-        [FindsBy(How = How.LinkText, Using = "Active")]
+        //[FindsBy(How = How.LinkText, Using = "Active")]
         IWebElement activeFilter;
 
-        [FindsBy(How = How.LinkText, Using = "Completed")]
+        //[FindsBy(How = How.LinkText, Using = "Completed")]
         IWebElement completedFilter;
 
         public void Visit()
